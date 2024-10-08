@@ -1,0 +1,4 @@
+name: AntiMiniMap
+version: '1.0-SNAPSHOT'
+main: de.phillip.antiMiniMap.AntiMiniMap
+api-version: '1.21'

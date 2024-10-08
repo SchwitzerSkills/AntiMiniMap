@@ -1,0 +1,5 @@
+active: true
+kickMessage: "&c%player% &7mods are forbitten."
+logger: true
+otherKickCommand: false
+kickCommand: "/ban %player% %kickMessage%"
