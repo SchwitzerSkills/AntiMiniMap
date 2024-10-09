@@ -13,6 +13,7 @@ public class JoinListener implements Listener, PluginMessageListener {
     private static final String FORGE_CHANNEL = "fml:hs";
     private static final String FABRIC_CHANNEL = "fabric:registry/sync";
     private static final String FORGE_CHANNEL_LEGACY = "fml:hsl";
+    private static final String LUNAR_APOLLO = "lunar:apollo";
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -25,6 +26,7 @@ public class JoinListener implements Listener, PluginMessageListener {
     boolean hasForge = false;
     boolean hasFabric = false;
     boolean hasOtherMods = false;
+    boolean hasClientMods = false;
 
     private void checkForMods(Player player) {
 
@@ -41,8 +43,10 @@ public class JoinListener implements Listener, PluginMessageListener {
                         hasForge = true;
                     } else if (lowerChannel.equals(FABRIC_CHANNEL.toLowerCase())) {
                         hasFabric = true;
+                    } else if (lowerChannel.equals(LUNAR_APOLLO.toLowerCase())) {
+                        hasClientMods = true;
                     } else if (lowerChannel.contains("forge") || lowerChannel.contains("fml") ||
-                            lowerChannel.contains("fabric") || lowerChannel.contains("mod")) {
+                            lowerChannel.contains("fabric") || lowerChannel.contains("mod") || lowerChannel.contains("lunar")) {
                         hasOtherMods = true;
                     }
                 }
@@ -77,6 +81,16 @@ public class JoinListener implements Listener, PluginMessageListener {
                         player.kickPlayer(AntiMiniMap.instance.getConfig().getString("kickMessage").replace("&", "§").replace("%player%", player.getName()));
                     }
                 }
+                if (hasClientMods) {
+                    if(AntiMiniMap.instance.getConfig().getBoolean("logger")) {
+                        AntiMiniMap.instance.getLogger().info(player.getName() + " has other mods installed.");
+                    }
+                    if(AntiMiniMap.instance.getConfig().getBoolean("otherKickCommand")) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), AntiMiniMap.instance.getConfig().getString("kickCommand").replace("/", "").replace("%kickMessage%", AntiMiniMap.instance.getConfig().getString("kickMessage").replace("&", "§").replace("%player%", player.getName())).replace("%player%", player.getName()));
+                    } else {
+                        player.kickPlayer(AntiMiniMap.instance.getConfig().getString("kickMessage").replace("&", "§").replace("%player%", player.getName()));
+                    }
+                }
                 if (!hasForge && !hasFabric && !hasOtherMods) {
                     if(AntiMiniMap.instance.getConfig().getBoolean("logger")) {
                         AntiMiniMap.instance.getLogger().info(player.getName() + " does not have any detected mods.");
@@ -86,6 +100,7 @@ public class JoinListener implements Listener, PluginMessageListener {
                 hasForge = false;
                 hasFabric = false;
                 hasOtherMods = false;
+                hasClientMods = false;
             }
         }.runTaskLater(AntiMiniMap.instance, 20L);
     }
@@ -101,8 +116,12 @@ public class JoinListener implements Listener, PluginMessageListener {
             if(AntiMiniMap.instance.getConfig().getBoolean("logger")) {
                 AntiMiniMap.instance.getLogger().info(player.getName() + " sent a Fabric mod message.");
             }
+        } else if (lowerChannel.equals(LUNAR_APOLLO.toLowerCase())) {
+            if(AntiMiniMap.instance.getConfig().getBoolean("logger")) {
+                AntiMiniMap.instance.getLogger().info(player.getName() + " sent a Lunar mod message.");
+            }
         } else if (lowerChannel.contains("forge") || lowerChannel.contains("fml") ||
-                lowerChannel.contains("fabric") || lowerChannel.contains("mod")) {
+                lowerChannel.contains("fabric") || lowerChannel.contains("mod") || lowerChannel.contains("lunar")) {
             if(AntiMiniMap.instance.getConfig().getBoolean("logger")) {
                 AntiMiniMap.instance.getLogger().info(player.getName() + " sent a message from an unknown mod channel: " + channel);
             }
